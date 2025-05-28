@@ -27,7 +27,10 @@ type AppM = ReaderT Env IO
 
 runServer :: Int -> Env -> IO ()
 runServer port env = scottyT port (`runReaderT` env) $ do
-  middleware simpleCors
+  middleware $ cors (const $ Just simpleCorsResourcePolicy
+    { corsRequestHeaders = ["Content-Type"]
+    , corsMethods = ["GET", "POST", "OPTIONS"]
+    })
   
   post "/query" $ do
     req <- jsonData :: ActionT TL.Text AppM QueryRequest
