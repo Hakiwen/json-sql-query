@@ -58,7 +58,7 @@
   <div style="margin-bottom: 20px;">
     <textarea 
       bind:value={query}
-      placeholder="Enter SQL query (e.g., SELECT * FROM table WHERE pop > 1000000)"
+      placeholder="Enter SQL query (e.g., SELECT * FROM data WHERE pop > 1000000)"
       style="width: 100%; height: 100px; font-family: monospace;"
     ></textarea>
     <button 

@@ -11,7 +11,7 @@ import Web.Scotty.Trans
 import Network.Wai.Middleware.Cors
 import Control.Monad.Reader
 import Control.Monad.IO.Class
-import Database.SQLite.Simple
+import Database.SQLite.Simple hiding (query)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL

@@ -3,7 +3,8 @@
 module SqlParser where
 
 import Types
-import Data.Attoparsec.Text
+import Data.Attoparsec.Text hiding (takeWhile)
+import qualified Data.Attoparsec.Text as A
 import Control.Applicative
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -24,9 +25,9 @@ sqlQuery = do
   skipSpace
   _ <- identifier
   skipSpace
-  whereCl <- optional whereClause
+  whereCl <- optional whereClause'
   skipSpace
-  limitCl <- optional limitClause
+  limitCl <- optional limitClause'
   skipSpace
   endOfInput
   return $ SqlQuery selectCl whereCl limitCl
@@ -37,8 +38,8 @@ selectClause = selectAll <|> selectColumns
     selectAll = char '*' >> return SelectAll
     selectColumns = SelectColumns <$> sepBy1 identifier (skipSpace >> char ',' >> skipSpace)
 
-whereClause :: Parser WhereClause
-whereClause = do
+whereClause' :: Parser WhereClause
+whereClause' = do
   _ <- string "WHERE"
   skipSpace
   whereExpr
@@ -83,13 +84,13 @@ comparison :: Parser Comparison
 comparison = do
   left <- value
   skipSpace
-  op <- compOp
+  op <- compOp'
   skipSpace
   right <- value
   return $ Comparison left op right
 
-compOp :: Parser CompOp
-compOp = (string "!=" >> return Neq)
+compOp' :: Parser CompOp
+compOp' = (string "!=" >> return Neq)
      <|> (string "=" >> return Eq)
      <|> (string "<" >> return Lt)
      <|> (string ">" >> return Gt)
@@ -108,13 +109,13 @@ value = numberLit <|> stringLit <|> colRef
 identifier :: Parser Text
 identifier = do
   first <- satisfy isAlpha
-  rest <- takeWhile (\c -> isAlphaNum c || c == '_')
+  rest <- A.takeWhile (\c -> isAlphaNum c || c == '_')
   return $ T.cons first rest
   where
     isAlpha c = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 
-limitClause :: Parser Int
-limitClause = do
+limitClause' :: Parser Int
+limitClause' = do
   _ <- string "LIMIT"
   skipSpace
   decimal

@@ -4,7 +4,7 @@
 module Types where
 
 import Data.Text (Text)
-import Data.Aeson
+import Data.Aeson (FromJSON, ToJSON)
 import GHC.Generics
 import qualified Data.Map as M
 import Data.Scientific (Scientific)

@@ -24,6 +24,7 @@ dependencies:
 - containers
 - vector
 - scientific
+- time
 
 executables:
   json-sql-query-exe:

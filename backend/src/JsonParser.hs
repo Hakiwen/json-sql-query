@@ -3,7 +3,10 @@
 module JsonParser where
 
 import Types
-import Data.Aeson
+import Data.Aeson hiding (Value)
+import qualified Data.Aeson as A
+import qualified Data.Aeson.KeyMap as KM
+import Data.Aeson.Key (toText)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Map as M
@@ -18,16 +21,16 @@ parseJsonFile path = do
     Left err -> return $ Left err
     Right val -> return $ parseJsonArray val
 
-parseJsonArray :: Value -> Either String [JsonRow]
-parseJsonArray (Array arr) = mapM parseJsonObject (V.toList arr)
+parseJsonArray :: A.Value -> Either String [JsonRow]
+parseJsonArray (A.Array arr) = mapM parseJsonObject (V.toList arr)
 parseJsonArray _ = Left "Expected JSON array at top level"
 
-parseJsonObject :: Value -> Either String JsonRow
-parseJsonObject (Object obj) = 
-  M.traverseWithKey parseJsonValue (M.mapKeys (\k -> k) obj)
+parseJsonObject :: A.Value -> Either String JsonRow
+parseJsonObject (A.Object obj) = 
+  M.traverseWithKey parseJsonValue (M.fromList $ map (\(k,v) -> (toText k, v)) $ KM.toList obj)
 parseJsonObject _ = Left "Expected JSON object"
 
-parseJsonValue :: Text -> Value -> Either String JsonValue
-parseJsonValue _ (String t) = Right $ JsonString t
-parseJsonValue _ (Number n) = Right $ JsonNumber n
+parseJsonValue :: Text -> A.Value -> Either String JsonValue
+parseJsonValue _ (A.String t) = Right $ JsonString t
+parseJsonValue _ (A.Number n) = Right $ JsonNumber n
 parseJsonValue k _ = Left $ "Unsupported value type for key: " ++ T.unpack k
